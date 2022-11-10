@@ -9,6 +9,8 @@ class TodoList extends StatefulWidget {
 }
 
 class _TodoListState extends State<TodoList> {
+  final List<String> _todoList = <String>[];
+  final TextEditingController _textFieldController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,5 +18,12 @@ class _TodoListState extends State<TodoList> {
         title: Text('To Do List'),
       ),
     );
+  }
+
+  void _addTodoItem(String title) {
+    setState(() {
+      _todoList.add(title);
+    });
+    _textFieldController.clear();
   }
 }
