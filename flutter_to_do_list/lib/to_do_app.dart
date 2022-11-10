@@ -26,4 +26,8 @@ class _TodoListState extends State<TodoList> {
     });
     _textFieldController.clear();
   }
+
+  Widget _buildTodoItem(String title) {
+    return ListTile(title: Text(title));
+  }
 }
