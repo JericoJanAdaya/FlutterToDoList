@@ -40,6 +40,14 @@ class _TodoListState extends State<TodoList> {
     _textFieldController.clear();
   }
 
+  void _replaceTodoItem(String title) {
+    setState(() {
+      int range = _todoList.indexOf(title);
+      _todoList.replaceRange(range, range + 1, [_textFieldController.text]);
+    });
+    _textFieldController.clear();
+  }
+
   void _toggleDone() {
     setState(() {
       isChecked = !isChecked;
@@ -48,6 +56,9 @@ class _TodoListState extends State<TodoList> {
 
   Widget _buildTodoItem(BuildContext context, title) {
     return ListTile(
+        onTap: () {
+          _toggleDone();
+        },
         title: Text(
           title,
           style: TextStyle(
@@ -56,7 +67,7 @@ class _TodoListState extends State<TodoList> {
         ),
         leading: Checkbox(
           value: isChecked,
-          onChanged: (bool? checkboxState) {
+          onChanged: (bool? checkBoxState) {
             _toggleDone();
           },
         ),
@@ -64,10 +75,7 @@ class _TodoListState extends State<TodoList> {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              onPressed: () {
-                _removeTodoItem(title);
-                isChecked ? _toggleDone() : null;
-              },
+              onPressed: () => _displayChange(context, title),
               icon: Icon(
                 Icons.edit_sharp,
                 color: Colors.grey,
@@ -85,6 +93,36 @@ class _TodoListState extends State<TodoList> {
             ),
           ],
         ));
+  }
+
+  Future<void> _displayChange(BuildContext context, title) async {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Change task'),
+            content: TextField(
+              controller: _textFieldController,
+              decoration: const InputDecoration(hintText: 'Enter task here'),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Change'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _replaceTodoItem(title);
+                },
+              ),
+              TextButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _textFieldController.clear();
+                },
+              )
+            ],
+          );
+        });
   }
 
   Future<void> _displayDialog(BuildContext context) async {
