@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 class TodoList extends StatefulWidget {
   const TodoList({super.key});
-
   @override
   _TodoListState createState() => _TodoListState();
 }
@@ -11,11 +10,13 @@ class TodoList extends StatefulWidget {
 class _TodoListState extends State<TodoList> {
   final List<String> _todoList = <String>[];
   final TextEditingController _textFieldController = TextEditingController();
+  bool isChecked = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('To Do List'),
+        centerTitle: true,
       ),
       body: ListView(children: _getItems()),
       floatingActionButton: FloatingActionButton(
@@ -32,34 +33,83 @@ class _TodoListState extends State<TodoList> {
     _textFieldController.clear();
   }
 
-  Widget _buildTodoItem(String title) {
-    return ListTile(title: Text(title));
+  void _removeTodoItem(String title) {
+    setState(() {
+      _todoList.remove(title);
+    });
+    _textFieldController.clear();
   }
 
-  Future<Future> _displayDialog(BuildContext context) async {
+  void _toggleDone() {
+    setState(() {
+      isChecked = !isChecked;
+    });
+  }
+
+  Widget _buildTodoItem(BuildContext context, title) {
+    return ListTile(
+        title: Text(
+          title,
+          style: TextStyle(
+            decoration: isChecked ? TextDecoration.lineThrough : null,
+          ),
+        ),
+        leading: Checkbox(
+          value: isChecked,
+          onChanged: (bool? checkboxState) {
+            _toggleDone();
+          },
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              onPressed: () {
+                _removeTodoItem(title);
+                isChecked ? _toggleDone() : null;
+              },
+              icon: Icon(
+                Icons.edit_sharp,
+                color: Colors.grey,
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                _removeTodoItem(title);
+                isChecked ? _toggleDone() : null;
+              },
+              icon: Icon(
+                Icons.delete_forever_outlined,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ));
+  }
+
+  Future<void> _displayDialog(BuildContext context) async {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Add a task to your list'),
+            title: Text('Add a task to your list'),
             content: TextField(
               controller: _textFieldController,
               decoration: const InputDecoration(hintText: 'Enter task here'),
             ),
             actions: <Widget>[
-              // add button
-              FloatingActionButton(
-                child: const Text('ADD'),
+              TextButton(
+                child: Text('Add'),
                 onPressed: () {
                   Navigator.of(context).pop();
                   _addTodoItem(_textFieldController.text);
                 },
               ),
-              // cancel button
-              FloatingActionButton(
-                child: const Text('CANCEL'),
+              TextButton(
+                child: Text('Cancel'),
                 onPressed: () {
                   Navigator.of(context).pop();
+                  _textFieldController.clear();
                 },
               )
             ],
@@ -68,10 +118,10 @@ class _TodoListState extends State<TodoList> {
   }
 
   List<Widget> _getItems() {
-    final List<Widget> _todoWidgets = <Widget>[];
+    final List<Widget> todoWidgets = <Widget>[];
     for (String title in _todoList) {
-      _todoWidgets.add(_buildTodoItem(title));
+      todoWidgets.add(_buildTodoItem(context, title));
     }
-    return _todoWidgets;
+    return todoWidgets;
   }
 }
