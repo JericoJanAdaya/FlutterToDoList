@@ -10,7 +10,6 @@ class TodoList extends StatefulWidget {
 class _TodoListState extends State<TodoList> {
   final List<String> _todoList = <String>[];
   final TextEditingController _textFieldController = TextEditingController();
-  bool isChecked = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +20,7 @@ class _TodoListState extends State<TodoList> {
       body: ListView(children: _getItems()),
       floatingActionButton: FloatingActionButton(
           onPressed: () => _displayDialog(context),
-          tooltip: 'Add Item',
+          tooltip: 'Add a task',
           child: Icon(Icons.add)),
     );
   }
@@ -48,28 +47,10 @@ class _TodoListState extends State<TodoList> {
     _textFieldController.clear();
   }
 
-  void _toggleDone() {
-    setState(() {
-      isChecked = !isChecked;
-    });
-  }
-
   Widget _buildTodoItem(BuildContext context, title) {
     return ListTile(
-        onTap: () {
-          _toggleDone();
-        },
         title: Text(
           title,
-          style: TextStyle(
-            decoration: isChecked ? TextDecoration.lineThrough : null,
-          ),
-        ),
-        leading: Checkbox(
-          value: isChecked,
-          onChanged: (bool? checkBoxState) {
-            _toggleDone();
-          },
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -84,7 +65,6 @@ class _TodoListState extends State<TodoList> {
             IconButton(
               onPressed: () {
                 _removeTodoItem(title);
-                isChecked ? _toggleDone() : null;
               },
               icon: Icon(
                 Icons.delete_forever_outlined,
